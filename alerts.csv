@@ -1,0 +1,4 @@
+username,ip_address,failed_logins,denied_access,risk_score,severity,reason
+user02,192.168.1.11,4,0,40,Medium,Repeated failed login attempts (4); Repeated failed logins from IP: 192.168.1.11
+user04,192.168.1.13,0,2,30,Medium,Repeated denied access attempts (2)
+user08,192.168.1.17,6,0,40,Medium,Repeated failed login attempts (6); Repeated failed logins from IP: 192.168.1.17

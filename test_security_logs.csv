@@ -1,0 +1,10 @@
+
+timestamp,username,ip_address,event_type,status,resource
+2026-10-21 10:00:00,testuser,192.168.1.50,login,failed,login_page
+2026-10-21 10:00:10,testuser,192.168.1.50,login,failed,login_page
+2026-10-21 10:00:20,testuser,192.168.1.50,login,failed,login_page
+2026-10-21 10:00:30,testuser,192.168.1.50,login,failed,login_page
+2026-10-21 10:01:00,testuser,192.168.1.50,access,denied,admin_panel
+2026-10-21 10:01:10,testuser,192.168.1.50,access,denied,admin_panel
+2026-10-21 10:02:00,normaluser,192.168.1.60,login,success,login_page
+

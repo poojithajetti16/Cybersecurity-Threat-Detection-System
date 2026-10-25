@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cybersecurity Threat Detection System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <header class="topbar">
+        <div>
+            <h1>CyberShield</h1>
+            <p>Cybersecurity Threat Detection System</p>
+        </div>
+
+        <span class="system-status">
+            ● Detection Dashboard
+        </span>
+    </header>
+
+
+    <main class="container">
+
+        <section class="welcome">
+            <div>
+                <h2>Security Overview</h2>
+                <p>
+                    Monitor suspicious activity and review
+                    detected security alerts.
+                </p>
+            </div>
+
+            <form action="{{ url_for('analyze') }}" method="POST">
+                <button class="analyze-button" type="submit">
+                    Analyze Logs
+                </button>
+            </form>
+        </section>
+        <!-- CSV Upload Section -->
+         <!-- CSV Upload Section -->
+<section class="panel upload-panel">
+    <div class="panel-heading">
+        <div>
+            <h2>Upload Security Logs</h2>
+            <p>Select a CSV file to analyze suspicious security activity.</p>
+        </div>
+    </div>
+
+    <form
+        action="{{ url_for('upload_csv') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+        <label for="csv_file">Choose a security log CSV file:</label>
+
+        <input
+            type="file"
+            id="csv_file"
+            name="csv_file"
+            accept=".csv,text/csv"
+            required
+        >
+
+        <button type="submit" class="analyze-button">
+            Analyze Uploaded File
+        </button>
+    </form>
+
+    <p>
+        Required columns: timestamp, username, ip_address,
+        event_type, status, resource.
+    </p>
+</section>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <!-- Dashboard Metric Cards -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <p>Total Security Events</p>
+                <h2>{{ total_events }}</h2>
+                <span>Events in the CSV log</span>
+            </div>
+
+            <div class="stat-card">
+                <p>Total Alerts</p>
+                <h2>{{ total_alerts }}</h2>
+                <span>Detected suspicious activities</span>
+            </div>
+
+            <div class="stat-card">
+                <p>High-Risk Alerts</p>
+                <h2>{{ high_risk }}</h2>
+                <span>High or Critical severity</span>
+            </div>
+
+            <div class="stat-card">
+                <p>Open Alerts</p>
+                <h2>{{ open_alerts }}</h2>
+                <span>Alerts awaiting resolution</span>
+            </div>
+
+        </section>
+
+
+        <!-- Alerts by Severity Doughnut Chart -->
+        <section class="chart-container">
+            <h2>Alerts by Severity</h2>
+            <canvas id="severityChart"></canvas>
+        </section>
+
+
+        <!-- Security Alerts Table -->
+        <section class="panel">
+
+            <div class="panel-heading">
+                <div>
+                    <h2>Security Alerts</h2>
+                    <p>Review detected suspicious activities below.</p>
+                    <h3>Resolved Alerts</h3>
+<p>{{ resolved_alerts }}</p>
+                </div>
+            </div>
+
+            
+    <!-- Alert Search and Filters -->
+    <form method="GET"
+          action="{{ url_for('dashboard') }}"
+          class="filter-form">
+
+        <div class="filter-field">
+            <label for="username">Search Username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Enter username..."
+                value="{{ search_username }}"
+            >
+        </div>
+
+        <div class="filter-field">
+            <label for="severity">Severity</label>
+            <select id="severity" name="severity">
+                <option value="">All Severities</option>
+
+                <option value="Critical"
+                    {% if selected_severity == 'Critical' %}selected{% endif %}>
+                    Critical
+                </option>
+
+                <option value="High"
+                    {% if selected_severity == 'High' %}selected{% endif %}>
+                    High
+                </option>
+
+                <option value="Medium"
+                    {% if selected_severity == 'Medium' %}selected{% endif %}>
+                    Medium
+                </option>
+
+                <option value="Low"
+                    {% if selected_severity == 'Low' %}selected{% endif %}>
+                    Low
+                </option>
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="status">Alert Status</label>
+            <select id="status" name="status">
+                <option value="">All Statuses</option>
+
+                <option value="Open"
+                    {% if selected_status == 'Open' %}selected{% endif %}>
+                    Open
+                </option>
+
+                <option value="Investigating"
+                    {% if selected_status == 'Investigating' %}selected{% endif %}>
+                    Investigating
+                </option>
+
+                <option value="Resolved"
+                    {% if selected_status == 'Resolved' %}selected{% endif %}>
+                    Resolved
+                </option>
+            </select>
+        </div>
+
+        <button type="submit" class="filter-button">
+            Apply Filters
+        </button>
+
+        <a href="{{ url_for('dashboard') }}"
+           class="clear-filter-button">
+            Clear Filters
+        </a>
+
+    </form>
+
+    <p class="filter-summary">
+        Showing {{ alerts|length }} matching alert(s).
+    </p>
+
+
+
+            {% if alerts %}
+
+            <div class="table-wrapper">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>IP Address</th>
+                            <th>Failed Logins</th>
+                            <th>Denied Access</th>
+                            <th>Risk Score</th>
+                            <th>Severity</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Update Status</th>
+                            <th>Detected At</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for alert in alerts %}
+
+                        <tr>
+                            <td>{{ alert["id"] }}</td>
+
+                            <td>{{ alert["username"] }}</td>
+
+                            <td>{{ alert["ip_address"] }}</td>
+
+                            <td>{{ alert["failed_logins"] }}</td>
+
+                            <td>{{ alert["denied_access"] }}</td>
+                            <td>{{ alert['detected_at'] or 'Not available' }}</td>
+
+                            <td>
+                                <strong>
+                                    {{ alert["risk_score"] }}/100
+                                </strong>
+                            </td>
+
+                            <td>
+                                <span class="badge {{ alert['severity']|lower }}">
+                                    {{ alert["severity"] }}
+                                </span>
+                            </td>
+
+                            <td>{{ alert["reason"] }}</td>
+
+                            <td>{{ alert["status"] }}</td>
+
+                            <td>
+                                <div class="status-actions">
+
+                                    <!-- Investigate Button -->
+                                    <form
+                                        action="{{ url_for(
+                                            'update_status',
+                                            alert_id=alert['id'],
+                                            status='Investigating'
+                                        ) }}"
+                                        method="POST">
+
+                                        <button
+                                            class="small-button"
+                                            type="submit">
+                                            Investigate
+                                        </button>
+                                    </form>
+
+
+                                    <!-- Resolve Button -->
+                                    <form
+                                        action="{{ url_for(
+                                            'update_status',
+                                            alert_id=alert['id'],
+                                            status='Resolved'
+                                        ) }}"
+                                        method="POST">
+
+                                        <button
+                                            class="small-button resolved"
+                                            type="submit">
+                                            Resolve
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <div class="empty-state">
+                    <h3>No alerts available</h3>
+                    <p>
+                        Click Analyze Logs to scan the security
+                        log file and generate alerts.
+                    </p>
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- Footer -->
+        <footer>
+            <p>
+                Cybersecurity Threat Detection System |
+                Academic Demonstration Prototype
+            </p>
+
+            <p>
+                Alerts are based on configured detection rules
+                and should be reviewed before taking action.
+            </p>
+        </footer>
+
+    </main>
+
+
+    <!-- Chart.js Library -->
+    <script id="severity-labels" type="application/json">
+    {{ severity_labels | tojson }}
+    </script>
+
+    <script id="severity-values" type="application/json">
+    {{ severity_values | tojson }}
+</script>
+    
+    <!-- Chart Data -->
+```html
+    <!-- Chart Data -->
+    <script id="severity-labels" type="application/json">
+        {{ severity_labels | tojson }}
+    </script>
+
+    <script id="severity-values" type="application/json">
+        {{ severity_values | tojson }}
+    </script>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Severity Chart -->
+    <script>
+        const severityLabels = JSON.parse(
+            document.getElementById("severity-labels").textContent
+        );
+
+        const severityValues = JSON.parse(
+            document.getElementById("severity-values").textContent
+        );
+
+        const chartCanvas = document.getElementById("severityChart");
+
+        new Chart(chartCanvas, {
+            type: "doughnut",
+            data: {
+                labels: severityLabels,
+                datasets: [{
+                    label: "Number of Alerts",
+                    data: severityValues
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
+```

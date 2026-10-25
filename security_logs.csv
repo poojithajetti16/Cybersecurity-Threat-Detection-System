@@ -1,0 +1,19 @@
+timestamp,username,ip_address,event_type,status,resource
+2026-10-19 09:00:00,user01,192.168.1.10,login,success,dashboard
+2026-10-19 09:01:00,user02,192.168.1.11,login,failed,dashboard
+2026-10-19 09:01:00,user02,192.168.1.11,login,failed,dashboard
+2026-10-19 09:01:00,user02,192.168.1.11,login,failed,dashboard
+2026-10-19 09:01:00,user02,192.168.1.11,login,failed,dashboard
+2026-10-19 09:03:00,user04,192.168.1.13,access,denied,admin_panel
+2026-10-19 09:03:10,user04,192.168.1.13,access,denied,admin_panel
+2026-10-19 09:04:00,user05,192.168.1.14,login,success,dashboard
+2026-10-19 09:05:00,user06,192.168.1.15,access,denied,restricted_data
+2026-10-19 09:06:00,user07,192.168.1.16,login,failed,dashboard
+2026-10-19 09:07:00,user07,192.168.1.16,login,failed,dashboard
+2026-10-19 09:08:00,user07,192.168.1.16,login,failed,dashboard
+2026-10-19 09:09:00,user08,192.168.1.17,login,failed,dashboard
+2026-10-19 09:09:10,user08,192.168.1.17,login,failed,dashboard
+2026-10-19 09:09:20,user08,192.168.1.17,login,failed,dashboard
+2026-10-19 09:09:30,user08,192.168.1.17,login,failed,dashboard
+2026-10-19 09:09:40,user08,192.168.1.17,login,failed,dashboard
+2026-10-19 09:09:50,user08,192.168.1.17,login,failed,dashboard
